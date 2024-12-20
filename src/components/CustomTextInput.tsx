@@ -2,6 +2,7 @@ import { View, Text, TextInput } from "react-native";
 import React, { useState } from "react";
 import Entypo from "@expo/vector-icons/Entypo";
 import { StyleSheet } from "react-native";
+import { colors } from "@/constants/constant";
 type TextInputProps = {
   placeholder?: string;
   leftIcon?: React.ReactElement;
@@ -69,7 +70,7 @@ const style = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#1c1a1e",
+    backgroundColor: colors.bgGrey,
     borderRadius: 8,
     overflow: "hidden",
     // paddingBlock: 2,

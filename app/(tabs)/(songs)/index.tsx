@@ -12,6 +12,7 @@ import useSetupTrackPlayer from "@/hooks/useSetupTrackPlayer";
 import useLocalMusic from "@/hooks/useLocalMusic";
 import TrackPlayer, { useActiveTrack } from "react-native-track-player";
 import FloatingPlayer from "@/components/FloatingPlayer";
+import SongsPlayShuffleBtn from "@/components/SongsPlayShuffleBtn";
 // SplashScreen.preventAutoHideAsync();
 const Songs = () => {
   useLocalMusic();
@@ -20,17 +21,11 @@ const Songs = () => {
   const handleTrackPlayerLoaded = useCallback(() => {
     SplashScreen.hideAsync();
   }, []);
-  // useSetupTrackPlayer({
-  //   onLoad: handleTrackPlayerLoaded,
-  // });
   useEffect(() => {
     if (!localMusic) return;
     (async () => {
       try {
         await TrackPlayer.add(localMusic);
-        // await TrackPlayer.play();
-        // await TrackPlayer.pause();
-        // await TrackPlayer.skip(activeTrackIndex);
       } catch (error: any) {
         console.log(error);
       }
@@ -61,6 +56,7 @@ const Songs = () => {
         setValue={setSearch}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <SongsPlayShuffleBtn />
         {filteredSongs && (
           <TrackList
             flatlistProps={{

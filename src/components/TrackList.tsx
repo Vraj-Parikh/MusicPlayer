@@ -45,7 +45,7 @@ const TrackList = ({ data, flatlistProps }: TrackListProps) => {
   return (
     <FlatList
       data={data}
-      contentContainerStyle={{ paddingTop: 20, paddingBottom: 170 }}
+      contentContainerStyle={{ paddingTop: 15, paddingBottom: 170 }}
       renderItem={({ item: track }) => (
         <TouchableHighlight onPress={() => handleSongChange(track)}>
           <TrackListItem

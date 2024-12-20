@@ -1,53 +1,44 @@
-import React, { useState } from "react";
+import React, { ComponentProps, useState, useCallback } from "react";
 import CustomButton from "../CustomButton";
 import * as Haptics from "expo-haptics";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import TrackPlayer, { RepeatMode } from "react-native-track-player";
+import { RepeatMode } from "react-native-track-player";
 import { musicStore } from "@/store/musicStore";
+import { match } from "ts-pattern";
+import { ToastAndroid } from "react-native";
 
+type IconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
+const repeatOrder: Array<RepeatMode> = [
+  RepeatMode.Off,
+  RepeatMode.Queue,
+  RepeatMode.Track,
+] as const;
 const PlayerRepeatMode = () => {
   const { storedRepeatMode, setStoredRepeatMode } = musicStore();
-  const repeatModeOptions: Array<"repeat" | "repeat-off" | "repeat-once"> = [
-    "repeat",
-    "repeat-off",
-    "repeat-once",
-  ] as const;
-  const repeatModeToast = [
-    "Repeat All",
-    "No Repeat",
-    "Repeat Current Track",
-  ] as const;
-  const repeatVal =
-    storedRepeatMode === RepeatMode.Queue
-      ? 0
-      : storedRepeatMode === RepeatMode.Off
-      ? 1
-      : 2;
-  const [repeatMode, setRepeatMode] = useState(repeatVal);
-  const handleOnRepeatChange = () => {
-    const newRepeatVal = (repeatMode + 1) % repeatModeOptions.length;
-    setRepeatMode(newRepeatVal);
-    const val =
-      newRepeatVal === 0
-        ? RepeatMode.Queue
-        : newRepeatVal === 1
-        ? RepeatMode.Off
-        : RepeatMode.Track;
-    TrackPlayer.setRepeatMode(val);
-    setStoredRepeatMode(val);
-  };
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>(storedRepeatMode);
+  const handleOnRepeatChange = useCallback(() => {
+    const newIdx = (repeatOrder.indexOf(repeatMode) + 1) % repeatOrder.length;
+    setRepeatMode(repeatOrder[newIdx]);
+    setStoredRepeatMode(repeatOrder[newIdx]);
+    const toastMsg = match(repeatOrder[newIdx])
+      .with(RepeatMode.Off, () => "No Repeat")
+      .with(RepeatMode.Queue, () => "Repeat All")
+      .with(RepeatMode.Track, () => "Repeat Current Track")
+      .otherwise(() => "");
+    ToastAndroid.show(toastMsg, ToastAndroid.SHORT);
+  }, [repeatMode]);
+  const iconName: IconName = match(repeatMode)
+    .with(RepeatMode.Off, (): IconName => "repeat-off")
+    .with(RepeatMode.Queue, (): IconName => "repeat")
+    .with(RepeatMode.Track, (): IconName => "repeat-once")
+    .otherwise((): IconName => "repeat-off");
   return (
     <CustomButton
       onPress={handleOnRepeatChange}
       style={{ alignItems: "center", marginTop: 20 }}
       hapticType={Haptics.NotificationFeedbackType.Error}
-      toastText={repeatModeToast[(repeatMode + 1) % repeatModeOptions.length]}
     >
-      <MaterialCommunityIcons
-        name={repeatModeOptions[repeatMode]}
-        size={26}
-        color="#fff"
-      />
+      <MaterialCommunityIcons name={iconName} size={26} color="#fff" />
     </CustomButton>
   );
 };

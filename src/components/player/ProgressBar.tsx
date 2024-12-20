@@ -37,7 +37,7 @@ const ProgressBar = () => {
           onPress={() => setShowRemainingTime(!showRemainingTime)}
         >
           {showRemainingTime
-            ? `-${secondsToMmSs(duration - time)}`
+            ? `- ${secondsToMmSs(duration - time)}`
             : secondsToMmSs(duration)}
         </Text>
       </View>

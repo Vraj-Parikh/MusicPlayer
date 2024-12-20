@@ -7,6 +7,7 @@ export const colors = {
   icon: "#fff",
   maximumTrackTintColor: "rgba(255,255,255,0.4)",
   minimumTrackTintColor: "rgba(255,255,255,0.6)",
+  bgGrey: "#1c1a1e",
 };
 export const sizes = {
   tabIconSizeSm: 20,

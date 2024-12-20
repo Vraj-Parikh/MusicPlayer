@@ -1,5 +1,5 @@
 import * as MediaLibrary from "expo-media-library";
-import { AddTrack } from "react-native-track-player";
+import { AddTrack, Track } from "react-native-track-player";
 export const convertToNativeTrackPlayerFormat = (
   data: Array<MediaLibrary.Asset>
 ): Array<AddTrack> => {
@@ -22,5 +22,15 @@ export const filterTracksByTitle = (
   return data.filter((item) =>
     item.title?.toLowerCase()?.includes(searchVal.toLowerCase())
   );
+};
+export const findTrackIdByUrl = (trackData: Track[], url: string) => {
+  let returnIdx: number | null = null;
+  for (let idx in trackData) {
+    if (url === trackData[idx].url) {
+      returnIdx = Number(idx);
+      break;
+    }
+  }
+  return returnIdx;
 };
 export const setUpPlayer = () => {};

@@ -17,6 +17,9 @@ import TrackPlayer, {
 import { colors, fontSize } from "@/constants/constant";
 import FastImage from "react-native-fast-image";
 import { FallBackArtworkUri } from "@/constants/images";
+import useLocalMusic from "@/hooks/useLocalMusic";
+import { musicStore } from "@/store/musicStore";
+import { findTrackIdByUrl } from "@/utility/ReactNativeTrackUtils";
 type TrackListProps = {
   flatlistProps: Partial<FlatListProps<AddTrack>>;
   data: AddTrack[];
@@ -24,25 +27,30 @@ type TrackListProps = {
 const TrackList = ({ data, flatlistProps }: TrackListProps) => {
   const activeTrack = useActiveTrack();
   const { playing } = useIsPlaying();
+  const { localMusic } = musicStore();
   const handleSongChange = useCallback(async (track: Track) => {
+    if (!localMusic) return;
     try {
-      // await TrackPlayer.skip(idx);
+      let idx = findTrackIdByUrl(localMusic, track?.url);
+      console.log(idx);
+      if (!idx) return;
       await TrackPlayer.load(track);
-      // console.log(await TrackPlayer.getActiveTrack());
       // await TrackPlayer.play();
+      // await TrackPlayer.skip(idx);
     } catch (error: any) {
       console.log(error?.message);
     }
   }, []);
+  // const handleSongChange = () => {};
   return (
     <FlatList
       data={data}
       contentContainerStyle={{ paddingTop: 20, paddingBottom: 170 }}
-      renderItem={({ item }) => (
-        <TouchableHighlight onPress={() => handleSongChange(item)}>
+      renderItem={({ item: track }) => (
+        <TouchableHighlight onPress={() => handleSongChange(track)}>
           <TrackListItem
-            track={item}
-            isActive={item.url === activeTrack?.url}
+            track={track}
+            isActive={track.url === activeTrack?.url}
             isPlaying={playing}
           />
         </TouchableHighlight>

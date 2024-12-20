@@ -1,6 +1,5 @@
 import * as MediaLibrary from "expo-media-library";
 import { Alert } from "react-native";
-import { AddTrack } from "react-native-track-player";
 
 export const permissionAlert = () => {
   Alert.alert("permission required", "this app needs to read audio files", [

@@ -1,13 +1,12 @@
 import {
-  View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Keyboard,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import TrackPlayer, {
-  Track,
   useActiveTrack,
   useIsPlaying,
 } from "react-native-track-player";
@@ -15,6 +14,7 @@ import FastImage from "react-native-fast-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors, fontSize, screenPadding } from "@/constants/constant";
 import { FallBackArtworkUri } from "@/constants/images";
+import { router } from "expo-router";
 // import MovingText from "./MovingText";
 const FloatingPlayer = () => {
   const [display, setDisplay] = useState<"none" | "flex">("flex");
@@ -29,13 +29,17 @@ const FloatingPlayer = () => {
   if (!track) {
     return <></>;
   }
+  const handleOnPress = () => {
+    router.push("/player");
+  };
   //TODO 2:24:00
   return (
-    <View
+    <Pressable
       style={{
         ...style.container,
         display: display,
       }}
+      onPress={handleOnPress}
     >
       <FastImage
         style={style.artworkImage}
@@ -57,7 +61,7 @@ const FloatingPlayer = () => {
       >
         <Ionicons name={playing ? "pause" : "play"} size={30} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 };
 

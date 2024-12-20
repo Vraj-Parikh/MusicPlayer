@@ -1,3 +1,4 @@
+import { colors } from "@/constants/constant";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
@@ -17,6 +18,17 @@ const RootNavigation = React.memo(() => {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="auth" />
       <Stack.Screen name="restricted" />
+      <Stack.Screen
+        name="player"
+        options={{
+          headerShown: true,
+          title: "NOW PLAYING",
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { color: colors.text, fontWeight: "bold" },
+          headerTintColor: colors.text,
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 });

@@ -1,9 +1,18 @@
-import { colors } from "@/constants/constant";
-import { Stack } from "expo-router";
+import useSetupTrackPlayer from "@/hooks/useSetupTrackPlayer";
+import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useCallback } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import TrackPlayer from "react-native-track-player";
+SplashScreen.preventAutoHideAsync();
 const _layout = () => {
+  TrackPlayer.registerPlaybackService(() => require("../PlaybackService"));
+  const handleTrackPlayerLoaded = useCallback(() => {
+    SplashScreen.hideAsync();
+  }, []);
+  useSetupTrackPlayer({
+    onLoad: handleTrackPlayerLoaded,
+  });
   return (
     <SafeAreaProvider>
       <StatusBar translucent />
@@ -18,17 +27,7 @@ const RootNavigation = React.memo(() => {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="auth" />
       <Stack.Screen name="restricted" />
-      <Stack.Screen
-        name="player"
-        options={{
-          headerShown: true,
-          title: "NOW PLAYING",
-          headerStyle: { backgroundColor: colors.background },
-          headerTitleStyle: { color: colors.text, fontWeight: "bold" },
-          headerTintColor: colors.text,
-          headerTitleAlign: "center",
-        }}
-      />
+      <Stack.Screen name="player" />
     </Stack>
   );
 });

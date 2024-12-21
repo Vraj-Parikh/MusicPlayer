@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { Redirect, SplashScreen, Tabs } from "expo-router";
+import React, { useEffect } from "react";
+import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BlurView } from "expo-blur";
@@ -7,19 +7,24 @@ import { StyleSheet } from "react-native";
 import { defaultStyles } from "@/styles/default";
 import { colors, fontSize, sizes } from "@/constants/constant";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FloatingPlayer from "@/components/FloatingPlayer";
+import useLocalMusic from "@/hooks/useLocalMusic";
 import { musicStore } from "@/store/musicStore";
 import TrackPlayer from "react-native-track-player";
-import FloatingPlayer from "@/components/FloatingPlayer";
-import useSetupTrackPlayer from "@/hooks/useSetupTrackPlayer";
-SplashScreen.preventAutoHideAsync();
 const _layout = () => {
-  TrackPlayer.registerPlaybackService(() => require("../../PlaybackService"));
-  const handleTrackPlayerLoaded = useCallback(() => {
-    SplashScreen.hideAsync();
-  }, []);
-  useSetupTrackPlayer({
-    onLoad: handleTrackPlayerLoaded,
-  });
+  useLocalMusic();
+  const { localMusic } = musicStore();
+  useEffect(() => {
+    if (!localMusic || localMusic.length === 0) return;
+    try {
+      TrackPlayer.add(localMusic);
+    } catch (error: any) {
+      console.log(error);
+    }
+    return () => {
+      TrackPlayer.reset();
+    };
+  }, [localMusic]);
   return (
     <SafeAreaView style={defaultStyles.container}>
       <Tabs

@@ -2,17 +2,22 @@ import { create } from "zustand";
 import { AddTrack, RepeatMode } from "react-native-track-player";
 type musicStoreType = {
   localMusic: AddTrack[] | null;
-  activeTrackIndex: number;
-  storedRepeatMode: RepeatMode;
   setLocalMusic: (localMusic: AddTrack[] | null) => void;
-  setActiveTrackIndex: (index: number) => void;
+  activeTrackUrl: string | null;
+  setActiveTrackUrl: (url: string) => void;
+  storedRepeatMode: RepeatMode;
   setStoredRepeatMode: (val: RepeatMode) => void;
+  favoriteSongs: Array<string>;
+  addTofavoriteSongs: (id: string) => void;
 };
-export const musicStore = create<musicStoreType>((set) => ({
+export const musicStore = create<musicStoreType>((set, get) => ({
   localMusic: null,
-  activeTrackIndex: 0,
-  storedRepeatMode: RepeatMode.Queue,
   setLocalMusic: (localMusic: AddTrack[] | null) => set({ localMusic }),
-  setActiveTrackIndex: (index: number) => set({ activeTrackIndex: index }),
+  activeTrackUrl: null,
+  setActiveTrackUrl: (url: string) => set({ activeTrackUrl: url }),
+  storedRepeatMode: RepeatMode.Queue,
   setStoredRepeatMode: (val: RepeatMode) => set({ storedRepeatMode: val }),
+  favoriteSongs: [],
+  addTofavoriteSongs: (id: string) =>
+    set((state) => ({ favoriteSongs: [id, ...state.favoriteSongs] })),
 }));

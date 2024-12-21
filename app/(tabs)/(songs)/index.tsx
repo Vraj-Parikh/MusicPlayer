@@ -1,43 +1,17 @@
-import { View, ScrollView, Text } from "react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { View, ScrollView } from "react-native";
+import React, { useState } from "react";
 import { defaultStyles } from "@/styles/default";
 import TrackList from "@/components/TrackList";
 import { colors, screenPadding } from "@/constants/constant";
 import CustomTextInput from "@/components/CustomTextInput";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { musicStore } from "@/store/musicStore";
-import { filterTracksByTitle } from "@/utility/ReactNativeTrackUtils";
-import { SplashScreen } from "expo-router";
-import useSetupTrackPlayer from "@/hooks/useSetupTrackPlayer";
-import useLocalMusic from "@/hooks/useLocalMusic";
-import TrackPlayer, { useActiveTrack } from "react-native-track-player";
-import FloatingPlayer from "@/components/FloatingPlayer";
-import SongsPlayShuffleBtn from "@/components/SongsPlayShuffleBtn";
-// SplashScreen.preventAutoHideAsync();
 const Songs = () => {
-  useLocalMusic();
   const [search, setSearch] = useState("");
-  const { localMusic, activeTrackIndex } = musicStore();
-  const handleTrackPlayerLoaded = useCallback(() => {
-    SplashScreen.hideAsync();
-  }, []);
-  useEffect(() => {
-    if (!localMusic) return;
-    (async () => {
-      try {
-        await TrackPlayer.add(localMusic);
-      } catch (error: any) {
-        console.log(error);
-      }
-    })();
-  }, []);
-  const filteredSongs = useMemo(
-    () => (search ? filterTracksByTitle(search, localMusic) : localMusic),
-    [search, localMusic]
-  );
-  if (!localMusic || localMusic.length === 0) {
-    return <View style={defaultStyles.container}></View>;
-  }
+  // const { localMusic } = musicStore();
+
+  // if (!localMusic || localMusic.length === 0) {
+  //   return <View style={defaultStyles.container}></View>;
+  // }
 
   return (
     <View
@@ -48,7 +22,6 @@ const Songs = () => {
         position: "relative",
       }}
     >
-      {/* TODO Why use scrollview? */}
       <CustomTextInput
         placeholder="Search Songs"
         leftIcon={<Ionicons name="search" size={24} color={colors.primary} />}
@@ -56,17 +29,13 @@ const Songs = () => {
         setValue={setSearch}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <SongsPlayShuffleBtn />
-        {filteredSongs && (
-          <TrackList
-            flatlistProps={{
-              scrollEnabled: false,
-            }}
-            data={filteredSongs}
-          />
-        )}
+        <TrackList
+          flatlistProps={{
+            scrollEnabled: false,
+          }}
+          search={search}
+        />
       </ScrollView>
-      {/* <FloatingPlayer /> */}
     </View>
   );
 };

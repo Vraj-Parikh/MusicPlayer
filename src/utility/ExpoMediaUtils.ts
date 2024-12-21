@@ -16,41 +16,40 @@ export const permissionAlert = () => {
 
 export const getAudioFiles = async () => {
   const mediaCountFunc = await MediaLibrary.getAssetsAsync({
-    mediaType: "audio",
+    mediaType: MediaLibrary.MediaType.audio,
   });
   const totalCountvar = mediaCountFunc.totalCount;
   const media = await MediaLibrary.getAssetsAsync({
-    mediaType: "audio",
-    first: totalCountvar, // Retrieve all audio files
-    //TODO Sort not working
-    // sortBy: MediaLibrary.SortBy.duration,
+    mediaType: MediaLibrary.MediaType.audio,
+    first: totalCountvar,
   });
-  //TODO filter only mp3
   if (media.assets.length) {
-    return media.assets;
+    return media.assets.filter((asset) => asset.duration >= 1);
   }
   return null;
 };
-
-export const getPermission = async () => {
-  return await MediaLibrary.getPermissionsAsync();
-};
-
-export const getMusic = async () => {
-  const { granted, canAskAgain } = await getPermission();
-  // if (granted) {
-  return await getAudioFiles();
-  // }
-  if (!granted && canAskAgain) {
-    const { granted: grantedRepeat, canAskAgain: canAskAgainRepeat } =
-      await getPermission();
-    if (grantedRepeat) {
-      return await getAudioFiles();
-    } else if (grantedRepeat && canAskAgainRepeat) {
-      // permissionAlert()
+export const getPermission = async (): Promise<boolean> => {
+  try {
+    const permissionResponse = await MediaLibrary.getPermissionsAsync();
+    if (permissionResponse.granted) {
+      return true;
     }
+
+    const response = await MediaLibrary.requestPermissionsAsync();
+    if (response.granted) return true;
+    else if (response?.canAskAgain) {
+      return (await MediaLibrary.getPermissionsAsync()).status === "granted";
+    }
+    return false;
+  } catch (error: any) {
+    console.log(error.message);
+    return false;
   }
-  return null;
+};
+export const getMusic = async () => {
+  const gotPermission = await getPermission();
+  if (!gotPermission) return;
+  return await getAudioFiles();
 };
 export const filterTracks = (
   data: MediaLibrary.Asset[],

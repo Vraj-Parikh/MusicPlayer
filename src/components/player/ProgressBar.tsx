@@ -9,9 +9,11 @@ const ProgressBar = () => {
   const { duration, position } = useProgress(250);
   const [showRemainingTime, setShowRemainingTime] = useState(false);
   const [time, setTime] = useState(position);
+  const [isSliding, setIsSliding] = useState(false);
   useEffect(() => {
+    if (isSliding) return;
     setTime(position);
-  }, [position]);
+  }, [position, isSliding]);
   return (
     <View>
       <Slider
@@ -22,11 +24,14 @@ const ProgressBar = () => {
         minimumTrackTintColor={colors.primary}
         maximumTrackTintColor={colors.primary}
         thumbTintColor={colors.primary}
+        step={1}
         onValueChange={async (value) => {
+          setIsSliding(true);
           setTime(value);
         }}
         onSlidingComplete={(value) => {
           setTime(value);
+          setIsSliding(false);
           TrackPlayer.seekTo(value);
         }}
       />
@@ -61,5 +66,4 @@ const style = StyleSheet.create({
     height: 20,
   },
 });
-
-export default React.memo(ProgressBar);
+export default ProgressBar;

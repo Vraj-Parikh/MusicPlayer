@@ -2,9 +2,9 @@ import { useCallback, useEffect } from "react";
 import * as MediaLibrary from "expo-media-library";
 import { getMusic, filterTracks } from "@/utility/ExpoMediaUtils";
 import { convertToNativeTrackPlayerFormat } from "@/utility/ReactNativeTrackUtils";
-import { musicStore } from "@/store/musicStore";
+import { useMusicStore } from "@/store/useMusicStore";
 function useLocalMusic() {
-  const { setLocalMusic } = musicStore();
+  const { setLocalMusic } = useMusicStore();
   const setMusicZustand = useCallback(async () => {
     const music = await getMusic();
     if (music) {

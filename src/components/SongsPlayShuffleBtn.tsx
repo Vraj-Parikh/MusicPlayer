@@ -3,18 +3,35 @@ import React from "react";
 import CustomButton from "./CustomButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors, fontSize } from "@/constants/constant";
-import { useIsPlaying } from "react-native-track-player";
+import TrackPlayer, { useIsPlaying } from "react-native-track-player";
 type SongsPlayShuffleBtnProps = {
-  onPressPlay: () => void;
-  onPressPause: () => void;
-  onPressShuffle: () => void;
+  trackLength: number;
 };
-const SongsPlayShuffleBtn = ({
-  onPressPlay,
-  onPressPause,
-  onPressShuffle,
-}: SongsPlayShuffleBtnProps) => {
+const SongsPlayShuffleBtn = ({ trackLength }: SongsPlayShuffleBtnProps) => {
   const { playing } = useIsPlaying();
+  const onPressPlay = () => {
+    try {
+      TrackPlayer.play();
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+  const onPressPause = () => {
+    try {
+      TrackPlayer.pause();
+    } catch (error: any) {
+      console.log(error?.message);
+    }
+  };
+  const onPressShuffle = () => {
+    try {
+      const randomIdx = Math.floor(Math.random() * trackLength);
+      TrackPlayer.skip(randomIdx);
+      TrackPlayer.play();
+    } catch (error: any) {
+      console.log(error?.message);
+    }
+  };
   return (
     <View style={style.container}>
       <CustomButton
@@ -45,7 +62,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 20,
+    gap: 10,
     // marginTop: 20,
     borderWidth: 2,
     // height: "100%",

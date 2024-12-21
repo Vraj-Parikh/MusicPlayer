@@ -3,7 +3,7 @@ import CustomButton from "../CustomButton";
 import * as Haptics from "expo-haptics";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { RepeatMode } from "react-native-track-player";
-import { musicStore } from "@/store/musicStore";
+import { useMusicStore } from "@/store/useMusicStore";
 import { match } from "ts-pattern";
 import { ToastAndroid } from "react-native";
 
@@ -14,7 +14,7 @@ const repeatOrder: Array<RepeatMode> = [
   RepeatMode.Track,
 ] as const;
 const PlayerRepeatMode = () => {
-  const { storedRepeatMode, setStoredRepeatMode } = musicStore();
+  const { storedRepeatMode, setStoredRepeatMode } = useMusicStore();
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(storedRepeatMode);
   const handleOnRepeatChange = useCallback(() => {
     const newIdx = (repeatOrder.indexOf(repeatMode) + 1) % repeatOrder.length;

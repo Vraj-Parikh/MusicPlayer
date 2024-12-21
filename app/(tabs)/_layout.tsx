@@ -9,22 +9,8 @@ import { colors, fontSize, sizes } from "@/constants/constant";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FloatingPlayer from "@/components/FloatingPlayer";
 import useLocalMusic from "@/hooks/useLocalMusic";
-import { musicStore } from "@/store/musicStore";
-import TrackPlayer from "react-native-track-player";
 const _layout = () => {
   useLocalMusic();
-  const { localMusic } = musicStore();
-  useEffect(() => {
-    if (!localMusic || localMusic.length === 0) return;
-    try {
-      TrackPlayer.add(localMusic);
-    } catch (error: any) {
-      console.log(error);
-    }
-    return () => {
-      TrackPlayer.reset();
-    };
-  }, [localMusic]);
   return (
     <SafeAreaView style={defaultStyles.container}>
       <Tabs

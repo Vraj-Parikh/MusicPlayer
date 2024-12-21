@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ToastAndroid } from "react-native";
 import { defaultStyles } from "@/styles/default";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useActiveTrack } from "react-native-track-player";
@@ -10,18 +10,40 @@ import PlayerRepeatMode from "@/components/player/PlayerRepeatMode";
 import VolumeBar from "@/components/player/VolumeBar";
 import ControlCenter from "@/components/player/ControlCenter";
 import ProgressBar from "@/components/player/ProgressBar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import usePlayerBackground from "@/hooks/usePlayerBackground";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
+import { useFavoritesTrackStore } from "@/store/useFavoritesTrackStore";
 const player = () => {
   const activeTrack = useActiveTrack();
-  console.log(activeTrack);
+  const { favoritesTracksIds, addFavorite, removeFavorite } =
+    useFavoritesTrackStore();
   const imageColors = usePlayerBackground(
     activeTrack?.artwork || FallBackArtworkUri
   );
-  const isFavourite = false;
+  const [favorite, setFavorite] = useState(false);
+  console.log(favoritesTracksIds);
+  useEffect(() => {
+    if (!activeTrack) return;
+    if (favoritesTracksIds.includes(activeTrack.id)) {
+      return setFavorite(true);
+    }
+    return setFavorite(false);
+  }, [favoritesTracksIds]);
+  const addToFavorite = () => {
+    if (!activeTrack) return;
+    addFavorite(activeTrack.id);
+    setFavorite(true);
+    ToastAndroid.show("Added To Favorites !", ToastAndroid.SHORT);
+  };
+  const removeFromFavorite = () => {
+    if (!activeTrack) return;
+    removeFavorite(activeTrack.id);
+    setFavorite(false);
+    ToastAndroid.show("Removed From Favorites !", ToastAndroid.SHORT);
+  };
   if (!activeTrack) {
     return <></>;
   }
@@ -69,11 +91,19 @@ const player = () => {
           <Text numberOfLines={1} style={style.titleText}>
             {activeTrack.title}
           </Text>
-          <Ionicons
-            name={isFavourite ? "heart" : "heart-outline"}
-            size={24}
-            color={isFavourite ? "red" : colors.textMuted}
-          />
+          {favorite ? (
+            <CustomButton onPress={removeFromFavorite}>
+              <Ionicons name="heart" size={24} color="red" />
+            </CustomButton>
+          ) : (
+            <CustomButton onPress={addToFavorite}>
+              <Ionicons
+                name="heart-outline"
+                size={24}
+                color={colors.textMuted}
+              />
+            </CustomButton>
+          )}
         </View>
         <Text numberOfLines={1} style={style.artistText}>
           {activeTrack.artist || "<unknown>"}

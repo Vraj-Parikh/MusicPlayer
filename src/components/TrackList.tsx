@@ -17,13 +17,14 @@ import TrackPlayer, {
 import { colors, fontSize } from "@/constants/constant";
 import FastImage from "react-native-fast-image";
 import { FallBackArtworkUri } from "@/constants/images";
-import { musicStore } from "@/store/musicStore";
 import {
   filterTracksByName,
   sortTracks,
 } from "@/utility/ReactNativeTrackUtils";
 import SongsPlayShuffleBtn from "./SongsPlayShuffleBtn";
 import SortByBtn from "./SortByBtn";
+import Loader from "./Loader";
+import { useActiveQueueStore } from "@/store/useActiveQueue";
 
 export type TSortBy = {
   sortBy: "Title" | "Duration" | "Recent";
@@ -33,35 +34,73 @@ type TrackListProps = {
   flatlistProps: Partial<FlatListProps<AddTrack>>;
   search: string;
   id: string;
+  data: Track[];
+  initialSortBy: TSortBy;
 };
-const TrackList = ({ id, search, flatlistProps }: TrackListProps) => {
+const TrackList = ({
+  id,
+  search,
+  flatlistProps,
+  data,
+  initialSortBy,
+}: TrackListProps) => {
   const activeTrack = useActiveTrack();
   const { playing } = useIsPlaying();
-  const { localMusic } = musicStore();
-  const [sortBy, setSortBy] = useState<TSortBy>({
-    sortBy: "Recent",
-    ascending: false,
-  });
-  const [filteredSongs, setFilteredSongs] = useState<AddTrack[]>([]);
-  const memoizedFilteredSongs = useMemo(
-    () => (search ? filterTracksByName(search, localMusic) : localMusic || []),
-    [search, localMusic]
-  );
-  useEffect(() => {
+  const { activeQueue, setActiveQueue } = useActiveQueueStore();
+  const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<TSortBy>(initialSortBy);
+  const filteredSongs = useMemo(() => {
+    setLoading(true);
+    let fileredTracks = data;
+    if (search) {
+      fileredTracks = filterTracksByName(search, data);
+    }
     const sortedSongs = sortTracks(
-      memoizedFilteredSongs,
+      fileredTracks,
       sortBy.sortBy,
       sortBy.ascending
     );
-    setFilteredSongs(sortedSongs);
-  }, [search, sortBy, localMusic]);
+    setLoading(false);
+    return sortedSongs;
+  }, [search, data, sortBy]);
+  useEffect(() => {
+    (async () => {
+      try {
+        let localSortedSongs = sortTracks(
+          data || [],
+          sortBy.sortBy,
+          sortBy.ascending
+        );
+        await TrackPlayer.add(localSortedSongs);
+        if (playing) {
+          return await TrackPlayer.play();
+        }
+        return await TrackPlayer.pause();
+      } catch (error: any) {
+        console.log(error?.message);
+      }
+    })();
+    return () => {
+      TrackPlayer.reset();
+    };
+  }, [sortBy]);
   const handleSongChange = async (selectedTrack: Track) => {
-    if (!localMusic || localMusic.length === 0) return;
+    if (!data || data.length === 0) return;
     try {
-      const trackId = localMusic.findIndex(
-        (track) => track.url === selectedTrack.url
+      const queueChanged = activeQueue !== id;
+      if (queueChanged) {
+        setActiveQueue(id);
+        await TrackPlayer.reset();
+        let localSortedSongs = sortTracks(
+          data || [],
+          sortBy.sortBy,
+          sortBy.ascending
+        );
+        await TrackPlayer.add(localSortedSongs);
+      }
+      const trackId = (await TrackPlayer.getQueue()).findIndex(
+        (track) => track.id === selectedTrack.id
       );
-      console.log(trackId);
       if (trackId === -1) return;
       TrackPlayer.skip(trackId);
       if (playing) {
@@ -72,29 +111,9 @@ const TrackList = ({ id, search, flatlistProps }: TrackListProps) => {
       console.log(error?.message);
     }
   };
-  const onPressPlay = () => {
-    try {
-      TrackPlayer.play();
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
-  const onPressPause = () => {
-    try {
-      TrackPlayer.pause();
-    } catch (error: any) {
-      console.log(error?.message);
-    }
-  };
-  const onPressShuffle = () => {
-    try {
-      const randomIdx = Math.floor(Math.random() * filteredSongs.length);
-      TrackPlayer.skip(randomIdx);
-      TrackPlayer.play();
-    } catch (error: any) {
-      console.log(error?.message);
-    }
-  };
+  if (loading) {
+    return <Loader />;
+  }
   return (
     <>
       {filteredSongs && filteredSongs.length > 0 && (
@@ -104,22 +123,21 @@ const TrackList = ({ id, search, flatlistProps }: TrackListProps) => {
             justifyContent: "space-between",
             gap: 5,
             alignItems: "center",
-            paddingLeft: 10,
+            paddingLeft: 5,
             marginTop: 20,
           }}
         >
           <SortByBtn setSortBy={setSortBy} sortBy={sortBy} />
-          <SongsPlayShuffleBtn
-            onPressPlay={onPressPlay}
-            onPressShuffle={onPressShuffle}
-            onPressPause={onPressPause}
-          />
+          <SongsPlayShuffleBtn trackLength={filteredSongs.length} />
         </View>
       )}
       <FlatList
         data={filteredSongs}
         extraData={filteredSongs}
-        contentContainerStyle={{ paddingTop: 15, paddingBottom: 170 }}
+        contentContainerStyle={{
+          paddingTop: 15,
+          paddingBottom: activeTrack ? 170 : 110,
+        }}
         renderItem={({ item: track }) => (
           <TouchableHighlight onPress={() => handleSongChange(track)}>
             <TrackListItem

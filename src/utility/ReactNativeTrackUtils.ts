@@ -6,6 +6,7 @@ export const convertToNativeTrackPlayerFormat = (
 ): Array<AddTrack> => {
   return data.map((track, idx) => {
     const convertTrack: AddTrack = {
+      id: track.id,
       creationTime: track.creationTime,
       modificationTime: track.modificationTime,
       url: track.uri,

@@ -15,7 +15,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors, fontSize, screenPadding } from "@/constants/constant";
 import { FallBackArtworkUri } from "@/constants/images";
 import { router } from "expo-router";
-// import MovingText from "./MovingText";
 const FloatingPlayer = () => {
   const [display, setDisplay] = useState<"none" | "flex">("flex");
   Keyboard.addListener("keyboardDidShow", () => {
@@ -51,11 +50,6 @@ const FloatingPlayer = () => {
       <Text style={style.textTitle} numberOfLines={1}>
         {track?.title}
       </Text>
-      {/* <MovingText
-        text={track?.title || ""}
-        style={style.textTitle}
-        animationThresold={25}
-      /> */}
       <TouchableOpacity
         onPress={playing ? TrackPlayer.pause : TrackPlayer.play}
       >

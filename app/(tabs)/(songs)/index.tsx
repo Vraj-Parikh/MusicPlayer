@@ -1,13 +1,10 @@
-import { View, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import React from "react";
 import { defaultStyles } from "@/styles/default";
-import TrackList, { TSortBy } from "@/components/TrackList";
-import { colors, screenPadding } from "@/constants/constant";
-import CustomTextInput from "@/components/CustomTextInput";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { TSortBy } from "@/components/TrackList";
 import { useMusicStore } from "@/store/useMusicStore";
+import TrackListContainer from "@/components/TrackListContainer";
 const Songs = () => {
-  const [search, setSearch] = useState("");
   const { localMusic } = useMusicStore();
 
   if (!localMusic || localMusic.length === 0) {
@@ -18,32 +15,11 @@ const Songs = () => {
     ascending: false,
   };
   return (
-    <View
-      style={{
-        ...defaultStyles.container,
-        paddingLeft: screenPadding.horizontal,
-        paddingRight: screenPadding.horizontal,
-        position: "relative",
-      }}
-    >
-      <CustomTextInput
-        placeholder="Search Songs"
-        leftIcon={<Ionicons name="search" size={24} color={colors.primary} />}
-        value={search}
-        setValue={setSearch}
-      />
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <TrackList
-          id="3"
-          flatlistProps={{
-            scrollEnabled: false,
-          }}
-          search={search}
-          data={localMusic}
-          initialSortBy={initialSortBy}
-        />
-      </ScrollView>
-    </View>
+    <TrackListContainer
+      id="3"
+      initialSortBy={initialSortBy}
+      data={localMusic}
+    />
   );
 };
 

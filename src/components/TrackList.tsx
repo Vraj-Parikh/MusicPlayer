@@ -87,6 +87,7 @@ const TrackList = ({
   const handleSongChange = async (selectedTrack: Track) => {
     if (!data || data.length === 0) return;
     try {
+      const { position } = await TrackPlayer.getProgress();
       const queueChanged = activeQueue !== id;
       if (queueChanged) {
         setActiveQueue(id);
@@ -104,7 +105,8 @@ const TrackList = ({
       if (trackId === -1) return;
       TrackPlayer.skip(trackId);
       if (playing) {
-        return await TrackPlayer.play();
+        await TrackPlayer.seekTo(position);
+        await TrackPlayer.play();
       }
       await TrackPlayer.pause();
     } catch (error: any) {
@@ -142,7 +144,7 @@ const TrackList = ({
           <TouchableHighlight onPress={() => handleSongChange(track)}>
             <TrackListItem
               track={track}
-              isActive={track.url === activeTrack?.url}
+              isActive={id === activeQueue && track.url === activeTrack?.url}
               isPlaying={playing}
             />
           </TouchableHighlight>

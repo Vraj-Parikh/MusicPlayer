@@ -24,14 +24,14 @@ const player = () => {
     activeTrack?.artwork || FallBackArtworkUri
   );
   const [favorite, setFavorite] = useState(false);
-  console.log(favoritesTracksIds);
   useEffect(() => {
     if (!activeTrack) return;
     if (favoritesTracksIds.includes(activeTrack.id)) {
-      return setFavorite(true);
+      setFavorite(true);
+    } else {
+      setFavorite(false);
     }
-    return setFavorite(false);
-  }, [favoritesTracksIds]);
+  }, [activeTrack, favoritesTracksIds]);
   const addToFavorite = () => {
     if (!activeTrack) return;
     addFavorite(activeTrack.id);

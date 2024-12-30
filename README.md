@@ -1,5 +1,5 @@
 
-MusicPlayer
+# MusicPlayer
 
 MusicPlayer is a mobile application built using React Native and Expo Development Build. It offers a seamless music listening experience with advanced playback features and an intuitive user interface.
 
@@ -24,6 +24,18 @@ Start the application:
 To Download apk:
 
     https://expo.dev/accounts/vraj151/projects/MusicPlayer/builds/ec11d685-2ebb-435c-917f-5c7e8ba32ba2
+
+### Preview
+<img src="https://raw.githubusercontent.com/Vraj-Parikh/MusicPlayer/main/mp-img1.jpg" align="left" height="400" width="200" >
+<img src="https://raw.githubusercontent.com/Vraj-Parikh/MusicPlayer/main/mp-img2.jpg" align="left" height="400" width="200" >
+<img src="https://raw.githubusercontent.com/Vraj-Parikh/MusicPlayer/main/mp-img3.jpg" align="left" height="400" width="200" >
+<img src="https://raw.githubusercontent.com/Vraj-Parikh/MusicPlayer/main/mp-img4.jpg" align="left" height="400" width="200" >
+<img src="https://raw.githubusercontent.com/Vraj-Parikh/MusicPlayer/main/mp-img5.jpg" align="left" height="400" width="200" >
+
+
+
+
+
 
 Usage
 

@@ -25,9 +25,10 @@ const RootNavigation = React.memo(() => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="auth" />
-      <Stack.Screen name="restricted" />
+      {/* <Stack.Screen name="auth" /> */}
+      {/* <Stack.Screen name="restricted" /> */}
       <Stack.Screen name="player" />
+      <Stack.Screen name="(modals)/addToPlaylist" />
     </Stack>
   );
 });

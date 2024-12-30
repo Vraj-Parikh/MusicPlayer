@@ -47,10 +47,9 @@ const TrackList = ({
   const activeTrack = useActiveTrack();
   const { playing } = useIsPlaying();
   const { activeQueue, setActiveQueue } = useActiveQueueStore();
-  const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState<TSortBy>(initialSortBy);
+
   const filteredSongs = useMemo(() => {
-    setLoading(true);
     let fileredTracks = data;
     if (search) {
       fileredTracks = filterTracksByName(search, data);
@@ -60,10 +59,10 @@ const TrackList = ({
       sortBy.sortBy,
       sortBy.ascending
     );
-    setLoading(false);
     return sortedSongs;
   }, [search, data, sortBy]);
   useEffect(() => {
+    if (activeQueue === null || activeQueue !== id) return;
     (async () => {
       try {
         let localSortedSongs = sortTracks(
@@ -71,11 +70,9 @@ const TrackList = ({
           sortBy.sortBy,
           sortBy.ascending
         );
+        await TrackPlayer.reset();
         await TrackPlayer.add(localSortedSongs);
-        if (playing) {
-          return await TrackPlayer.play();
-        }
-        return await TrackPlayer.pause();
+        //TODO after clearing fetch current active track and play it
       } catch (error: any) {
         console.log(error?.message);
       }
@@ -85,18 +82,17 @@ const TrackList = ({
     };
   }, [sortBy]);
   const handleSongChange = async (selectedTrack: Track) => {
-    if (!data || data.length === 0) return;
     try {
-      const { position } = await TrackPlayer.getProgress();
+      if (!data || data.length === 0) return;
       const queueChanged = activeQueue !== id;
-      if (queueChanged) {
-        setActiveQueue(id);
-        await TrackPlayer.reset();
+      if (activeQueue == null || queueChanged) {
         let localSortedSongs = sortTracks(
           data || [],
           sortBy.sortBy,
           sortBy.ascending
         );
+        setActiveQueue(id);
+        await TrackPlayer.reset();
         await TrackPlayer.add(localSortedSongs);
       }
       const trackId = (await TrackPlayer.getQueue()).findIndex(
@@ -105,17 +101,17 @@ const TrackList = ({
       if (trackId === -1) return;
       TrackPlayer.skip(trackId);
       if (playing) {
-        await TrackPlayer.seekTo(position);
         await TrackPlayer.play();
+      } else {
+        await TrackPlayer.pause();
       }
-      await TrackPlayer.pause();
     } catch (error: any) {
       console.log(error?.message);
     }
   };
-  if (loading) {
-    return <Loader />;
-  }
+  // if (loading) {
+  //   return <Loader />;
+  // }
   return (
     <>
       {filteredSongs && filteredSongs.length > 0 && (
@@ -130,7 +126,11 @@ const TrackList = ({
           }}
         >
           <SortByBtn setSortBy={setSortBy} sortBy={sortBy} />
-          <SongsPlayShuffleBtn trackLength={filteredSongs.length} />
+          <SongsPlayShuffleBtn
+            trackLength={filteredSongs.length}
+            id={id}
+            setSortBy={setSortBy}
+          />
         </View>
       )}
       <FlatList

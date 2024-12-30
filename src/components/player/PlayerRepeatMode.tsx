@@ -19,6 +19,7 @@ const PlayerRepeatMode = () => {
   const handleOnRepeatChange = useCallback(() => {
     const newIdx = (repeatOrder.indexOf(repeatMode) + 1) % repeatOrder.length;
     setRepeatMode(repeatOrder[newIdx]);
+    console.log(repeatOrder[newIdx]);
     setStoredRepeatMode(repeatOrder[newIdx]);
     const toastMsg = match(repeatOrder[newIdx])
       .with(RepeatMode.Off, () => "No Repeat")

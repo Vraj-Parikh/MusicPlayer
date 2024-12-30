@@ -18,9 +18,7 @@ const ControlCenter = () => {
       </CustomButton>
       <CustomButton
         hapticType={Haptics.NotificationFeedbackType.Success}
-        onPress={() => {
-          playing ? TrackPlayer.stop() : TrackPlayer.play();
-        }}
+        onPress={playing ? TrackPlayer.stop : TrackPlayer.play}
       >
         <Ionicons name={playing ? "pause" : "play"} size={55} color="#fff" />
       </CustomButton>

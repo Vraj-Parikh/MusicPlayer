@@ -3,31 +3,58 @@ import React from "react";
 import CustomButton from "./CustomButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors, fontSize } from "@/constants/constant";
-import TrackPlayer, { useIsPlaying } from "react-native-track-player";
+import TrackPlayer, {
+  useActiveTrack,
+  useIsPlaying,
+} from "react-native-track-player";
+import { useActiveQueueStore } from "@/store/useActiveQueue";
+import { TSortBy } from "./TrackList";
 type SongsPlayShuffleBtnProps = {
   trackLength: number;
+  id: string;
+  setSortBy: React.Dispatch<React.SetStateAction<TSortBy>>;
 };
-const SongsPlayShuffleBtn = ({ trackLength }: SongsPlayShuffleBtnProps) => {
+const SongsPlayShuffleBtn = ({
+  trackLength,
+  id,
+  setSortBy,
+}: SongsPlayShuffleBtnProps) => {
   const { playing } = useIsPlaying();
-  const onPressPlay = () => {
+  const activeTrack = useActiveTrack();
+  const { activeQueue, setActiveQueue } = useActiveQueueStore();
+  const isactiveQueue = activeQueue === id;
+  const onPressPlay = async () => {
     try {
-      TrackPlayer.play();
+      if (isactiveQueue) {
+        if (activeTrack) {
+          await TrackPlayer.play();
+        }
+      } else {
+        setActiveQueue(id);
+        setSortBy((prev) => ({ ...prev }));
+        // await TrackPlayer.skip(0);
+        await TrackPlayer.play();
+      }
     } catch (error: any) {
       console.log(error);
     }
   };
-  const onPressPause = () => {
+  const onPressPause = async () => {
     try {
-      TrackPlayer.pause();
+      await TrackPlayer.pause();
     } catch (error: any) {
       console.log(error?.message);
     }
   };
-  const onPressShuffle = () => {
+  const onPressShuffle = async () => {
     try {
-      const randomIdx = Math.floor(Math.random() * trackLength);
-      TrackPlayer.skip(randomIdx);
-      TrackPlayer.play();
+      if (!isactiveQueue) {
+        await onPressPlay();
+      } else {
+        const randomIdx = Math.floor(Math.random() * trackLength);
+        await TrackPlayer.skip(randomIdx);
+        await TrackPlayer.play();
+      }
     } catch (error: any) {
       console.log(error?.message);
     }
@@ -40,11 +67,13 @@ const SongsPlayShuffleBtn = ({ trackLength }: SongsPlayShuffleBtnProps) => {
       >
         <>
           <Ionicons
-            name={playing ? "pause" : "play"}
+            name={playing && isactiveQueue ? "pause" : "play"}
             size={20}
             color={colors.primary}
           />
-          <Text style={style.text}>{playing ? "Pause" : "Play"}</Text>
+          <Text style={style.text}>
+            {playing && isactiveQueue ? "Pause" : "Play"}
+          </Text>
         </>
       </CustomButton>
       <CustomButton style={style.btnContainer} onPress={onPressShuffle}>

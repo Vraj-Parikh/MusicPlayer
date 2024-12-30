@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { utilityStyle } from "@/styles/default";
 import { colors, fontSize } from "@/constants/constant";
@@ -6,8 +6,9 @@ import { secondsToMmSs } from "@/utility/helper";
 import Entypo from "@expo/vector-icons/Entypo";
 import FastImage from "react-native-fast-image";
 import { FallBackArtworkUri } from "@/constants/images";
-import { Track, useIsPlaying } from "react-native-track-player";
+import { Track } from "react-native-track-player";
 import LoaderKit from "react-native-loader-kit";
+import ShortcutMenu from "./ShortcutMenu";
 const style = StyleSheet.create({
   artistText: {
     color: colors.textMuted,
@@ -88,12 +89,14 @@ const TrackListItem = ({ track, isActive, isPlaying }: TrackListItemProps) => {
         </Text>
       </View>
       <View style={utilityStyle.center}>
-        <TouchableOpacity>
-          <Entypo name="dots-three-horizontal" size={18} color="#fff" />
-        </TouchableOpacity>
-        <Text style={style.durationText}>
-          {track?.duration && secondsToMmSs(track?.duration)}
-        </Text>
+        <ShortcutMenu track={track}>
+          <>
+            <Entypo name="dots-three-horizontal" size={18} color="#fff" />
+            <Text style={style.durationText}>
+              {track?.duration && secondsToMmSs(track?.duration)}
+            </Text>
+          </>
+        </ShortcutMenu>
       </View>
     </View>
   );

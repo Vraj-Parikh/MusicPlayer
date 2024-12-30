@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import React from "react";
 import { defaultStyles } from "@/styles/default";
 import { router } from "expo-router";
@@ -26,23 +26,29 @@ const Playlists = () => {
   }
   return (
     <View style={style.mainContainer}>
-      {playlists.map(({ name }) => (
-        <TouchableOpacity
-          key={name}
-          style={style.container}
-          onPress={() => router.push(`/playlists/${name}`)}
-        >
-          <FastImage
-            source={{
-              uri: FallbackPlaylistUri,
-              priority: FastImage.priority.normal,
-            }}
-            resizeMode="cover"
-            style={style.img}
-          />
-          <Text style={style.text}>{name}</Text>
-        </TouchableOpacity>
-      ))}
+      <FlatList
+        horizontal
+        data={playlists}
+        contentContainerStyle={{ gap: 20 }}
+        renderItem={({ item: { name } }) => (
+          <TouchableOpacity
+            key={name}
+            style={style.container}
+            activeOpacity={0.6}
+            onPress={() => router.push(`/playlists/${name}`)}
+          >
+            <FastImage
+              source={{
+                uri: FallbackPlaylistUri,
+                priority: FastImage.priority.high,
+              }}
+              resizeMode="cover"
+              style={style.img}
+            />
+            <Text style={style.text}>{name}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 };
@@ -53,7 +59,8 @@ const style = StyleSheet.create({
     height: 200,
   },
   container: {
-    width: "45%",
+    width: 150,
+    height: 250,
     borderWidth: 0.4,
     borderColor: colors.primary,
     borderRadius: 10,

@@ -1,14 +1,12 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { useSearchParams } from "expo-router/build/hooks";
+import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
 import TrackListContainer from "@/components/TrackListContainer";
 import { TSortBy } from "@/components/TrackList";
 import { useMusicStore } from "@/store/useMusicStore";
 
 const SongsByArtist = () => {
-  const searchParams = useSearchParams();
+  const { artist: artistName } = useLocalSearchParams<{ artist: string }>();
   const { localMusic } = useMusicStore();
-  const artistName = searchParams.get("artist");
   if (!artistName || !localMusic) {
     return <></>;
   }
@@ -24,6 +22,8 @@ const SongsByArtist = () => {
       id="4"
       initialSortBy={initialSortBy}
       data={filterSongsByArtist}
+      title={`Tracks By ${artistName}`}
+      showbackButton={true}
     />
   );
 };
